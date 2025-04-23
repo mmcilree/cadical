@@ -52,7 +52,8 @@ HuubTracer::~HuubTracer () {
 void HuubTracer::enlarge_clauses () {
   assert (num_clauses == size_clauses);
   const uint64_t new_size_clauses = size_clauses ? 2 * size_clauses : 1;
-  LOG ("VeriPB (HUUB) Tracer enlarging clauses from %" PRIu64 " to %" PRIu64,
+  LOG ("VeriPB (HUUB) Tracer enlarging clauses from %" PRIu64
+       " to %" PRIu64,
        (uint64_t) size_clauses, (uint64_t) new_size_clauses);
   HashId **new_clauses;
   new_clauses = new HashId *[new_size_clauses];
@@ -184,15 +185,15 @@ inline void HuubTracer::put_binary_id (uint64_t id) {
 /*------------------------------------------------------------------------*/
 
 void HuubTracer::veripb_begin_proof (uint64_t reserved_ids) {
-  file->put ("pseudo-Boolean proof version 2.0\n");
+  file->put ("pseudo-Boolean proof version 3.0\n");
   file->put ("f ");
   file->put (reserved_ids);
-  file->put ("\n");
+  file->put (" ;\n");
 }
 
-void HuubTracer::veripb_add_derived_clause (
-    uint64_t id, bool redundant, const vector<int> &clause,
-    const vector<uint64_t> &chain) {
+void HuubTracer::veripb_add_derived_clause (uint64_t id, bool redundant,
+                                            const vector<int> & /*clause*/,
+                                            const vector<uint64_t> &chain) {
   file->put ("@c");
   file->put (id);
   file->put (" pol ");
@@ -210,32 +211,37 @@ void HuubTracer::veripb_add_derived_clause (
       file->put (" + s");
     }
   }
-  file->put ("\n");
-  file->put (" e ");
-  for (const auto &external_lit : clause) {
-    file->put ("1 ");
-    if (external_lit < 0)
-      file->put ('~');
-    file->put ('x');
-    file->put (abs (external_lit));
-    file->put (' ');
-  }
-  file->put (">= 1 ; @c");
-  file->put (id);
-  file->put("\n");
+  file->put (" ;\n");
+  // // Think about the relative tradeoff of doing these e checks
+  // file->put (" e ");
+  // for (const auto &external_lit : clause) {
+  //   file->put ("1 ");
+  //   if (external_lit < 0)
+  //     file->put ('~');
+  //   file->put ('x');
+  //   file->put (abs (external_lit));
+  //   file->put (' ');
+  // }
+  // file->put (">= 1 ; @c");
+  // file->put (id);
+  // file->put (" \n");
+
+  // // Likewise think later about whether we really want to move all of
+  // // these to core
   if (!redundant && checked_deletions) {
     file->put ("core id ");
     file->put ("@c");
     file->put (id);
-    file->put ("\n");
+    file->put (" ;\n");
   }
 }
 
 void HuubTracer::veripb_add_derived_clause (uint64_t id, bool redundant,
-                                              const vector<int> &clause, bool asserted = false) {
+                                            const vector<int> &clause,
+                                            bool asserted = false) {
   file->put ("@c");
   file->put (id);
-  if ( asserted )
+  if (asserted)
     file->put (" a ");
   else
     file->put (" rup ");
@@ -253,7 +259,7 @@ void HuubTracer::veripb_add_derived_clause (uint64_t id, bool redundant,
     file->put ("core id ");
     file->put ("@c");
     file->put (id);
-    file->put ("\n");
+    file->put (" ;\n");
   }
 }
 
@@ -267,7 +273,7 @@ void HuubTracer::veripb_delete_clause (uint64_t id, bool redundant) {
   }
   file->put ("@c");
   file->put (id);
-  file->put ("\n");
+  file->put (" ;\n");
 }
 
 void HuubTracer::veripb_strengthen (uint64_t id) {
@@ -276,7 +282,7 @@ void HuubTracer::veripb_strengthen (uint64_t id) {
   file->put ("core id ");
   file->put ("@c");
   file->put (id);
-  file->put ("\n");
+  file->put (" ;\n");
 }
 
 /*------------------------------------------------------------------------*/
@@ -291,11 +297,13 @@ void HuubTracer::begin_proof (uint64_t id) {
 }
 
 void HuubTracer::add_derived_clause (uint64_t id, bool redundant,
-                                       const vector<int> &clause,
-                                       const vector<uint64_t> &chain) {
+                                     const vector<int> &clause,
+                                     const vector<uint64_t> &chain) {
   if (file->closed ())
     return;
-  LOG ("VERIPB (HUUB) TRACER tracing addition of derived clause[%" PRId64 "]", id);
+  LOG ("VERIPB (HUUB) TRACER tracing addition of derived clause[%" PRId64
+       "]",
+       id);
   if (with_antecedents)
     veripb_add_derived_clause (id, redundant, clause, chain);
   else
@@ -306,18 +314,20 @@ void HuubTracer::add_derived_clause (uint64_t id, bool redundant,
 }
 
 void HuubTracer::add_original_clause (uint64_t id, bool redundant,
-  const vector<int> &clause, bool) {
-if (file->closed ())
-return;
-LOG ("VERIPB (HUUB) TRACER tracing addition of original (external) clause[%" PRId64 "]", id);
-veripb_add_derived_clause (id, redundant, clause, true);
+                                      const vector<int> &clause, bool) {
+  if (file->closed ())
+    return;
+  LOG ("VERIPB (HUUB) TRACER tracing addition of original (external) "
+       "clause[%" PRId64 "]",
+       id);
+  veripb_add_derived_clause (id, redundant, clause, true);
 #ifndef QUIET
-added++;
+  added++;
 #endif
 }
 
 void HuubTracer::delete_clause (uint64_t id, bool redundant,
-                                  const vector<int> &) {
+                                const vector<int> &) {
   if (file->closed ())
     return;
   LOG ("VERIPB (HUUB) TRACER tracing deletion of clause[%" PRId64 "]", id);
@@ -332,7 +342,8 @@ void HuubTracer::weaken_minus (uint64_t id, const vector<int> &) {
     return;
   if (file->closed ())
     return;
-  LOG ("VERIPB (HUUB) TRACER tracing weaken minus of clause[%" PRId64 "]", id);
+  LOG ("VERIPB (HUUB) TRACER tracing weaken minus of clause[%" PRId64 "]",
+       id);
   last_id = id;
   insert ();
 }
@@ -340,7 +351,8 @@ void HuubTracer::weaken_minus (uint64_t id, const vector<int> &) {
 void HuubTracer::strengthen (uint64_t id) {
   if (file->closed ())
     return;
-  LOG ("VERIPB (HUUB) TRACER tracing strengthen of clause[%" PRId64 "]", id);
+  LOG ("VERIPB (HUUB) TRACER tracing strengthen of clause[%" PRId64 "]",
+       id);
   veripb_strengthen (id);
 }
 
