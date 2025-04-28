@@ -5,7 +5,7 @@ class FileTracer;
 
 namespace CaDiCaL {
 
-struct HashId; 
+struct HashId;
 
 class HuubTracer : public FileTracer {
   Internal *internal;
@@ -15,6 +15,7 @@ class HuubTracer : public FileTracer {
 #endif
   bool with_antecedents;
   bool checked_deletions;
+  bool should_conclude;
 
   // hash table for checked deletions
   //
@@ -80,6 +81,11 @@ public:
   void finalize_clause (uint64_t, const vector<int> &) override {} // skip
 
   void report_status (int, uint64_t) override {} // skip
+
+  void conclude_unsat (ConclusionType,
+                       const std::vector<uint64_t> &) override;
+
+  void conclude_next (bool next) override;
 
   void weaken_minus (uint64_t, const vector<int> &) override;
   void strengthen (uint64_t) override;

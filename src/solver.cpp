@@ -314,10 +314,10 @@ static bool tracing_api_calls_through_environment_variable_method;
 /*------------------------------------------------------------------------*/
 
 // Default implementations for some of the ExternalPropagator callbacks
-int prop_add_reason_clause_lit_default(void*, int) { return 0; }
-int prop_decide_default(void*) { return 0; }
-void prop_notify_fixed_assignment_default(void*, int) { }
-int prop_propagate_default(void*) { return 0; }
+int prop_add_reason_clause_lit_default (void *, int) { return 0; }
+int prop_decide_default (void *) { return 0; }
+void prop_notify_fixed_assignment_default (void *, int) {}
+int prop_propagate_default (void *) { return 0; }
 
 /*------------------------------------------------------------------------*/
 
@@ -955,24 +955,26 @@ void Solver::disconnect_learner () {
 //   LOG_API_CALL_BEGIN ("connect_fixed_listener");
 //   REQUIRE_VALID_STATE ();
 //   REQUIRE (fixed_listener, "can not connect zero fixed listener");
-// 
+//
 // #ifdef LOGGING
 //   if (external->fixed_listener)
 //     LOG ("connecting new listener of fixed assignments (disconnecting "
 //          "previous one)");
 //   else
-//     LOG ("connecting new listener of fixed assigments (no previous one)");
+//     LOG ("connecting new listener of fixed assigments (no previous
+//     one)");
 // #endif
 //   if (external->fixed_listener)
 //     disconnect_fixed_listener ();
 //   external->fixed_listener = fixed_listener;
 //   // Listeners are treated as real-time listeners, thus previously found
 //   // fixed assignments are not sent out (would be rather expensive to
-//   // recover it retrospect, see external_propagate.cpp/get_fixed_literals ()
+//   // recover it retrospect, see external_propagate.cpp/get_fixed_literals
+//   ()
 //   // function).
 //   LOG_API_CALL_END ("connect_fixed_listener");
 // }
-// 
+//
 // void Solver::disconnect_fixed_listener () {
 //   LOG_API_CALL_BEGIN ("disconnect_fixed_listener");
 //   REQUIRE_VALID_STATE ();
@@ -990,34 +992,42 @@ void Solver::disconnect_learner () {
 /*===== IPASIR-UP BEGIN ==================================================*/
 
 void Solver::connect_external_propagator (
-	void *propagator_data,
-	void (*prop_notify_assignments) (void* prop, const int* lits, size_t size),
-	void (*prop_notify_new_decision_level) (void* prop),
-	void (*prop_notify_backtrack) (void* prop, size_t new_level, bool restart),
-	bool (*prop_cb_check_found_model) (void* prop, const int* model, size_t size),
-	bool (*prop_cb_has_external_clause) (void* prop, bool* is_forgettable),
-	int (*prop_cb_add_external_clause_lit) (void* prop),
-	bool is_lazy,
-	bool forgettable_reasons,
-	bool notify_fixed,
-	int (*prop_cb_decide) (void* prop),
-	int (*prop_cb_propagate) (void* prop),
-	int (*prop_cb_add_reason_clause_lit) (void* prop, int propagated_lit),
-	void (*prop_notify_fixed_assignment) (void* prop, int lit)
-) {
+    void *propagator_data,
+    void (*prop_notify_assignments) (void *prop, const int *lits,
+                                     size_t size),
+    void (*prop_notify_new_decision_level) (void *prop),
+    void (*prop_notify_backtrack) (void *prop, size_t new_level,
+                                   bool restart),
+    bool (*prop_cb_check_found_model) (void *prop, const int *model,
+                                       size_t size),
+    bool (*prop_cb_has_external_clause) (void *prop, bool *is_forgettable),
+    int (*prop_cb_add_external_clause_lit) (void *prop), bool is_lazy,
+    bool forgettable_reasons, bool notify_fixed,
+    int (*prop_cb_decide) (void *prop),
+    int (*prop_cb_propagate) (void *prop),
+    int (*prop_cb_add_reason_clause_lit) (void *prop, int propagated_lit),
+    void (*prop_notify_fixed_assignment) (void *prop, int lit)) {
   LOG_API_CALL_BEGIN ("connect_external_propagator");
   REQUIRE_VALID_STATE ();
   REQUIRE (propagator_data, "can not connect zero propagator");
-  REQUIRE (prop_notify_assignments, "can not connect zero propagator callback");
-  REQUIRE (prop_notify_new_decision_level, "can not connect zero propagator callback");
-  REQUIRE (prop_notify_backtrack, "can not connect zero propagator callback");
-  REQUIRE (prop_cb_check_found_model, "can not connect zero propagator callback");
-  REQUIRE (prop_cb_has_external_clause, "can not connect zero propagator callback");
-  REQUIRE (prop_cb_add_external_clause_lit, "can not connect zero propagator callback");
+  REQUIRE (prop_notify_assignments,
+           "can not connect zero propagator callback");
+  REQUIRE (prop_notify_new_decision_level,
+           "can not connect zero propagator callback");
+  REQUIRE (prop_notify_backtrack,
+           "can not connect zero propagator callback");
+  REQUIRE (prop_cb_check_found_model,
+           "can not connect zero propagator callback");
+  REQUIRE (prop_cb_has_external_clause,
+           "can not connect zero propagator callback");
+  REQUIRE (prop_cb_add_external_clause_lit,
+           "can not connect zero propagator callback");
   REQUIRE (prop_cb_decide, "can not connect zero propagator callback");
   REQUIRE (prop_cb_propagate, "can not connect zero propagator callback");
-  REQUIRE (prop_cb_add_reason_clause_lit, "can not connect zero propagator callback");
-  REQUIRE (prop_notify_fixed_assignment, "can not connect zero propagator callback");
+  REQUIRE (prop_cb_add_reason_clause_lit,
+           "can not connect zero propagator callback");
+  REQUIRE (prop_notify_fixed_assignment,
+           "can not connect zero propagator callback");
 
 #ifdef LOGGING
   if (external->propagator_data)
@@ -1034,7 +1044,8 @@ void Solver::connect_external_propagator (
   external->prop_notify_backtrack = prop_notify_backtrack;
   external->prop_cb_check_found_model = prop_cb_check_found_model;
   external->prop_cb_has_external_clause = prop_cb_has_external_clause;
-  external->prop_cb_add_external_clause_lit = prop_cb_add_external_clause_lit;
+  external->prop_cb_add_external_clause_lit =
+      prop_cb_add_external_clause_lit;
   external->prop_is_lazy = is_lazy;
   external->prop_forgettable_reasons = forgettable_reasons;
   external->prop_notify_fixed_event = notify_fixed;
@@ -1212,6 +1223,11 @@ void Solver::close_proof_trace (bool print_statistics_unless_quiet) {
 void Solver::begin_proof (uint64_t id) {
   TRACE ("begin_proof", id);
   internal->begin_proof (id);
+}
+
+void Solver::conclude_next (bool next) {
+  TRACE ("conclude_next", next);
+  internal->conclude_next (next);
 }
 
 /*------------------------------------------------------------------------*/
@@ -1505,9 +1521,7 @@ void Solver::dump_cnf () {
 
 /*------------------------------------------------------------------------*/
 
-void *Solver::get_propagator () {
-  return external->propagator_data;
-}
+void *Solver::get_propagator () { return external->propagator_data; }
 
 bool Solver::observed (int lit) {
   TRACE ("observed", lit);

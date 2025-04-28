@@ -1383,6 +1383,8 @@ struct Internal {
   // Manually begin the proof
   // (Added for Huub)
   void begin_proof (uint64_t);
+  // Manually tell the proof tracer whether to conclude at the next UNSAT
+  void conclude_next (bool);
 
   // Dump to '<stdout>' as DIMACS for debugging.
   //

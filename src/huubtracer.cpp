@@ -6,8 +6,8 @@ namespace CaDiCaL {
 
 HuubTracer::HuubTracer (Internal *i, File *f, bool b, bool a, bool c)
     : internal (i), file (f), with_antecedents (a), checked_deletions (c),
-      num_clauses (0), size_clauses (0), clauses (0), last_hash (0),
-      last_id (0), last_clause (0)
+      should_conclude (false), num_clauses (0), size_clauses (0),
+      clauses (0), last_hash (0), last_id (0), last_clause (0)
 #ifndef QUIET
       ,
       added (0), deleted (0)
@@ -401,4 +401,15 @@ void HuubTracer::flush (bool print) {
   (void) print;
 #endif
 }
+
+void HuubTracer::conclude_unsat (ConclusionType,
+                                 const std::vector<uint64_t> &) {
+  if (should_conclude) {
+    file->put ("output NONE;\n");
+    file->put ("conclusion UNSAT;\n");
+    file->put ("end pseudo-Boolean proof;\n");
+  }
+}
+
+void HuubTracer::conclude_next (bool next) { should_conclude = next; }
 } // namespace CaDiCaL

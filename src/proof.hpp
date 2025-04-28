@@ -99,6 +99,7 @@ public:
 
   void report_status (int, uint64_t);
   void begin_proof (uint64_t);
+  void conclude_next (bool);
   void conclude_unsat (ConclusionType, const vector<uint64_t> &);
   void conclude_sat (const vector<int> &model);
   void conclude_unknown (const vector<int> &trace);

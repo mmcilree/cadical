@@ -134,6 +134,10 @@ public:
   // will give the current trail as a vector.
   //
   virtual void conclude_unknown (const std::vector<int> &) {}
+
+  // Notify the observer that it should/shouldn't conclude at the
+  // next UNSAT (nb: only huub_tracer needs/implements this)
+  virtual void conclude_next (bool) {}
 };
 
 /*--------------------------------------------------------------------------*/

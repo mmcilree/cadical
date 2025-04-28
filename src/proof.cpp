@@ -214,7 +214,14 @@ void Internal::flush_trace (bool print) {
 // (Added for Huub logging specifically), where id will always be 0
 void Internal::begin_proof (uint64_t id) {
   if (proof)
-    proof->begin_proof(id);
+    proof->begin_proof (id);
+}
+
+// Manually tell the tracer whether to conclude at the next UNSAT or not
+// (Added for Huub logging specifically)
+void Internal::conclude_next (bool next) {
+  if (proof)
+    proof->conclude_next (next);
 }
 
 /*------------------------------------------------------------------------*/
@@ -681,6 +688,13 @@ void Proof::conclude_unknown (const vector<int> &trail) {
   LOG (clause, "PROOF conclude unknown");
   for (auto &tracer : tracers) {
     tracer->conclude_unknown (trail);
+  }
+}
+
+void Proof::conclude_next (bool next) {
+  LOG (clause, "PROOF conclude next");
+  for (auto &tracer : tracers) {
+    tracer->conclude_next (next);
   }
 }
 
