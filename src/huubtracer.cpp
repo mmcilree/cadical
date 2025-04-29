@@ -403,10 +403,17 @@ void HuubTracer::flush (bool print) {
 }
 
 void HuubTracer::conclude_unsat (ConclusionType,
-                                 const std::vector<uint64_t> &) {
+                                 const std::vector<uint64_t> &trail) {
   if (should_conclude) {
     file->put ("output NONE;\n");
-    file->put ("conclusion UNSAT;\n");
+
+    file->put ("conclusion UNSAT");
+    if (trail.size () == 1) {
+      file->put (" : @c");
+      file->put (trail[0]);
+    }
+
+    file->put (";\n");
     file->put ("end pseudo-Boolean proof;\n");
   }
 }
