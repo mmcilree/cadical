@@ -12,7 +12,7 @@ External::External (Internal *i)
       prop_notify_backtrack (0), prop_cb_check_found_model (0),
       prop_cb_decide (0), prop_cb_propagate (0),
       prop_cb_add_reason_clause_lit (0), prop_cb_has_external_clause (0),
-      prop_cb_add_external_clause_lit(0), solution (0), vars (max_var) {
+      prop_cb_add_external_clause_lit (0), solution (0), vars (max_var) {
   assert (internal);
   assert (!internal->external);
   internal->external = this;
@@ -386,7 +386,8 @@ void External::add_observed_var (int elit) {
   assert (!internal->level);
 
   std::vector<int> assigned = {unit};
-  prop_notify_assignments (propagator_data, assigned.data(), assigned.size());
+  prop_notify_assignments (propagator_data, assigned.data (),
+                           assigned.size ());
 }
 
 void External::remove_observed_var (int elit) {
@@ -467,6 +468,10 @@ bool External::is_decision (int elit) {
 
   int ilit = internalize (elit);
   return internal->is_decision (ilit);
+}
+
+void External::add_proof_hint (const char *hint) {
+  internal->add_proof_hint (hint);
 }
 
 void External::force_backtrack (size_t new_level) {

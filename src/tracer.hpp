@@ -138,6 +138,9 @@ public:
   // Notify the observer that it should/shouldn't conclude at the
   // next UNSAT (nb: only huub_tracer needs/implements this)
   virtual void conclude_next (bool) {}
+
+  // Added only for the sake of huub_tracer
+  virtual void add_hint (const char *) {}
 };
 
 /*--------------------------------------------------------------------------*/

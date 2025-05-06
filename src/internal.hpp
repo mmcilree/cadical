@@ -1380,11 +1380,15 @@ struct Internal {
   void conclude_unsat ();
   void reset_concluded ();
 
+  // --- The following methods were added for Huub proof logging ---
   // Manually begin the proof
-  // (Added for Huub)
   void begin_proof (uint64_t);
   // Manually tell the proof tracer whether to conclude at the next UNSAT
   void conclude_next (bool);
+  // Tell the proof tracer that the next clause should be associated with
+  // the following string hint
+  void add_proof_hint (const char *);
+  // --- End Huub-proof-specific methods ----
 
   // Dump to '<stdout>' as DIMACS for debugging.
   //

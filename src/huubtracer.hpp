@@ -31,6 +31,9 @@ class HuubTracer : public FileTracer {
   HashId *last_clause;
   uint64_t compute_hash (uint64_t); // compute and save hash value of clause
 
+  std::string next_hint; // Appended to assertions in proof.
+
+  // &std::string
   HashId *new_clause ();
   void delete_clause (HashId *);
 
@@ -77,6 +80,7 @@ public:
   void add_derived_clause (uint64_t, bool, const vector<int> &,
                            const vector<uint64_t> &) override;
 
+  void add_hint (const char *) override;
   void delete_clause (uint64_t, bool, const vector<int> &) override;
   void finalize_clause (uint64_t, const vector<int> &) override {} // skip
 

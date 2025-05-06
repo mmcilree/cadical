@@ -7,7 +7,8 @@ namespace CaDiCaL {
 HuubTracer::HuubTracer (Internal *i, File *f, bool b, bool a, bool c)
     : internal (i), file (f), with_antecedents (a), checked_deletions (c),
       should_conclude (false), num_clauses (0), size_clauses (0),
-      clauses (0), last_hash (0), last_id (0), last_clause (0)
+      clauses (0), last_hash (0), last_id (0), last_clause (0),
+      next_hint ("")
 #ifndef QUIET
       ,
       added (0), deleted (0)
@@ -254,7 +255,12 @@ void HuubTracer::veripb_add_derived_clause (uint64_t id, bool redundant,
     file->put (abs (external_lit));
     file->put (' ');
   }
-  file->put (">= 1 ;\n");
+  file->put (">= 1");
+  if (!next_hint.empty ()) {
+    file->put (next_hint.c_str ());
+    next_hint = "";
+  }
+  file->put (";\n");
   if (!redundant && checked_deletions) {
     file->put ("core id ");
     file->put ("@c");
@@ -337,6 +343,10 @@ void HuubTracer::delete_clause (uint64_t id, bool redundant,
 #endif
 }
 
+void HuubTracer::add_hint (const char *hint) {
+  next_hint = std::string (hint);
+}
+
 void HuubTracer::weaken_minus (uint64_t id, const vector<int> &) {
   if (!checked_deletions)
     return;
@@ -416,6 +426,7 @@ void HuubTracer::conclude_unsat (ConclusionType,
     file->put (";\n");
     file->put ("end pseudo-Boolean proof;\n");
   }
+  close (false); // Ensure we don't write anything after concluding.
 }
 
 void HuubTracer::conclude_next (bool next) { should_conclude = next; }

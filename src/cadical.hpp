@@ -473,6 +473,10 @@ public:
 
   // ====== END IPASIR-UP ==================================================
 
+  // Proposed additional IPASIR-UP function(s?)
+  // Added specifically for experimental Huub proof logging
+  void add_proof_hint (const char *hint);
+
   //------------------------------------------------------------------------
   // Adds a literal to the constraint clause. Same functionality as 'add'
   // but the clause only exists for the next call to solve (same lifetime as

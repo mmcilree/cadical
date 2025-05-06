@@ -1117,6 +1117,15 @@ void Solver::reset_observed_vars () {
 
 /*===== IPASIR-UP END ====================================================*/
 
+void Solver::add_proof_hint (const char *hint) {
+  TRACE ("add_proof_hint");
+  REQUIRE_VALID_OR_SOLVING_STATE ();
+  external->add_proof_hint (
+      hint); // Also not sure whether we strictly need to go
+  // through external
+  LOG_API_CALL_END ("add_proof_hint");
+}
+
 int Solver::active () const {
   TRACE ("active");
   REQUIRE_VALID_STATE ();

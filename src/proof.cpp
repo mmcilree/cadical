@@ -224,6 +224,13 @@ void Internal::conclude_next (bool next) {
     proof->conclude_next (next);
 }
 
+// Tell tell the tracer the next clause should be associated with the
+// provided string hint (Added for Huub logging specifically)
+void Internal::add_proof_hint (const char *hint) {
+  if (proof)
+    proof->add_hint (hint);
+}
+
 /*------------------------------------------------------------------------*/
 
 Proof::Proof (Internal *s) : internal (s), lratbuilder (0) {
@@ -572,6 +579,13 @@ void Proof::add_derived_clause () {
   proof_chain.clear ();
   clause.clear ();
   clause_id = 0;
+}
+
+void Proof::add_hint (const char *hint) {
+  LOG (clause, "PROOF adding hint");
+  for (auto &tracer : tracers) {
+    tracer->add_hint (hint);
+  }
 }
 
 void Proof::delete_clause () {

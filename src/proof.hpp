@@ -81,6 +81,10 @@ public:
   void add_derived_clause (uint64_t, bool, const vector<int> &,
                            const vector<uint64_t> &);
 
+  // Add a hint to be associated with the next clause
+  // Only used by huub_tracer
+  void add_hint (const char *hint);
+
   // deletion of clauses. It comes in several variants, depending if the
   // clause should be restored or not
   void delete_clause (uint64_t, bool, const vector<int> &);
